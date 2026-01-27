@@ -1,10 +1,31 @@
 import database from "/infra/database.js";
 
 async function status(request, response) {
-  const result = await database.query("SELECT 1 + 1 as sum;");
-  console.log(result.rows);
+  const updatedAt = new Date().toISOString();
 
-  return response.status(200).json({ status: "ok" });
+  //
+
+  const resVersion = await database.query("SHOW server_version;"),
+    version = resVersion.rows[0].server_version;
+
+  const resMaxConn = await database.query("SHOW max_connections;"),
+    maxConn = resMaxConn.rows[0].max_connections;
+
+  const resUsedConn = await database.query(
+      "SELECT count(*) FROM pg_stat_activity WHERE state = 'active'",
+    ),
+    usedConn = resUsedConn.rows[0].count;
+
+  return response.status(200).json({
+    updated_at: updatedAt,
+    dependencies: {
+      database: {
+        version: version,
+        max_connections: maxConn,
+        opened_connections: usedConn,
+      },
+    },
+  });
 }
 
 export default status;
