@@ -3,8 +3,6 @@ import database from "/infra/database.js";
 async function status(request, response) {
   const updatedAt = new Date().toISOString();
 
-  //
-
   const resVersion = await database.query("SHOW server_version;"),
     version = resVersion.rows[0].server_version;
 
@@ -12,7 +10,7 @@ async function status(request, response) {
     maxConn = resMaxConn.rows[0].max_connections;
 
   const resUsedConn = await database.query(
-      "SELECT count(*) FROM pg_stat_activity WHERE state = 'active'",
+      "SELECT count(*)::int FROM pg_stat_activity WHERE state = 'active'",
     ),
     usedConn = resUsedConn.rows[0].count;
 
@@ -21,7 +19,7 @@ async function status(request, response) {
     dependencies: {
       database: {
         version: version,
-        max_connections: maxConn,
+        max_connections: parseInt(maxConn),
         opened_connections: usedConn,
       },
     },
