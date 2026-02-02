@@ -10,7 +10,7 @@ async function status(request, response) {
     maxConn = resMaxConn.rows[0].max_connections;
 
   const resUsedConn = await database.query(
-      "SELECT count(*)::int FROM pg_stat_activity WHERE state = 'active'",
+      "SELECT count(*)::int FROM pg_stat_activity",
     ),
     usedConn = resUsedConn.rows[0].count;
 
