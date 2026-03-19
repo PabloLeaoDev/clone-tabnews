@@ -18,7 +18,7 @@ test("GET api/v1/status should return 200", async () => {
 
   expect(responseBody.updated_at).toEqual(parsedUpdatedAt);
   // expect(isNaN(responseBody.dependencies.database.version)).toBe(false);
-  expect(responseBody.dependencies.database.version).toBe('16.11 (df20cf9)');
+  expect(responseBody.dependencies.database.version).toBe("16.11");
   expect(
     Number.isInteger(
       Number(responseBody.dependencies.database.max_connections),
