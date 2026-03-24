@@ -8,12 +8,12 @@ async function migrations(request, response) {
     pending: 201,
     applied: 200,
   };
+  
+  let 
+    dryRun = true,
+    dbClient = await database.getNewClient();
 
   try {
-    let 
-      dryRun = true,
-      dbClient = await database.getNewClient();
-  
     if (request.method === "GET") 
       console.log("GET:");
     else if (request.method === "POST") {
