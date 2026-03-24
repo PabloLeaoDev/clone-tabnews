@@ -1,6 +1,7 @@
 import migrationRunner from "node-pg-migrate";
 import { join } from "node:path";
 import database from "infra/database";
+import { error } from "node:console";
 
 async function migrations(request, response) {
   const migrationsType = {
@@ -14,9 +15,12 @@ async function migrations(request, response) {
 
   try {
     if (allowedMethods.includes(request.method)) {
-      if (request.method == "POST") dryRun = false;
+      if (request.method == allowedMethods[1]) dryRun = false;
       console.log(request.method);
-    } else return response.status(405).json({ message: "Method not allowed" });
+    } else
+      return response
+        .status(405)
+        .json({ message: `Method "${request.method}" not allowed` });
 
     const migrations = await migrationRunner({
       dir: join("infra", "migrations"),
@@ -34,6 +38,7 @@ async function migrations(request, response) {
       .json(migrations);
   } catch (e) {
     console.error(e.message);
+    throw error;
   } finally {
     await dbClient.end();
   }
