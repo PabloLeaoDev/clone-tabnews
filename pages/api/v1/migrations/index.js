@@ -1,42 +1,39 @@
 import migrationRunner from "node-pg-migrate";
 import { join } from "node:path";
 import database from "infra/database";
-import { error } from "node:console";
 
 async function migrations(request, response) {
   const migrationsType = {
     pending: 201,
     applied: 200,
   };
-  
-  let 
-    dryRun = true,
+
+  let dryRun = true,
+    allowedMethods = ["GET", "POST"],
     dbClient = await database.getNewClient();
 
   try {
-    if (request.method === "GET") 
-      console.log("GET:");
-    else if (request.method === "POST") {
-      console.log("POST:");
-      dryRun = false;
+    if (allowedMethods.includes(request.method)) {
+      if (request.method == "POST") dryRun = false;
+      console.log(request.method);
     } else return response.status(405).json({ message: "Method not allowed" });
-  
+
     const migrations = await migrationRunner({
       dir: join("infra", "migrations"),
       direction: "up",
-      verbose: true,  
+      verbose: true,
       migrationsTable: "pgmigrations",
       dryRun,
       dbClient,
     });
-    
+
     return response
-    .status(
-      migrations.length > 0 ? migrationsType.pending : migrationsType.applied,
-    )
-    .json(migrations);
+      .status(
+        migrations.length > 0 ? migrationsType.pending : migrationsType.applied,
+      )
+      .json(migrations);
   } catch (e) {
-    console.error(error.message);
+    console.error(e.message);
   } finally {
     await dbClient.end();
   }
