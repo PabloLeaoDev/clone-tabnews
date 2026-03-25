@@ -6,7 +6,8 @@ test("GET api/v1/status should return 200", async () => {
 
   expect(responseBody.updated_at).toBeDefined();
   expect(responseBody.dependencies.database).toBeDefined();
-  expect(responseBody.dependencies.database).toHaveProperty("version");
+  expect(responseBody.dependencies.database).toHaveProperty("environment");
+  expect(responseBody.dependencies.database).toHaveProperty("server_version");
   expect(responseBody.dependencies.database).toHaveProperty("max_connections");
   expect(responseBody.dependencies.database).toHaveProperty(
     "opened_connections",
@@ -17,8 +18,8 @@ test("GET api/v1/status should return 200", async () => {
   const parsedUpdatedAt = new Date(responseBody.updated_at).toISOString();
 
   expect(responseBody.updated_at).toEqual(parsedUpdatedAt);
-  // expect(isNaN(responseBody.dependencies.database.version)).toBe(false);
-  expect(responseBody.dependencies.database.version).toBe("16.11");
+  // expect(isNaN(responseBody.dependencies.database.server_version)).toBe(false);
+  expect(responseBody.dependencies.database.server_version).toBe("16.11");
   expect(
     Number.isInteger(
       Number(responseBody.dependencies.database.max_connections),
