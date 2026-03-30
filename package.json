@@ -4,7 +4,7 @@
   "description": "Projeto de implementação do https://www.tabnews.com.br para o https://curso.dev",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run services:up && next dev",
+    "dev": "npm run services:up && npm run wait-for-postgres && npm run migrations:up && next dev",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:stop": "docker compose -f infra/compose.yaml stop",
     "services:down": "docker compose -f infra/compose.yaml down",
@@ -14,10 +14,11 @@
     "lint:fix": "prettier --write .",
     "test": "jest --runInBand",
     "test:watch": "jest --watchAll --runInBand",
-    "migrate:create": "node-pg-migrate -m infra/migrations create",
-    "migrate:up": "node-pg-migrate -m infra/migrations --envPath .env.development up",
-    "migrate:down": "node-pg-migrate -m infra/migrations --envPath .env.development down",
-    "migrate:status": "node-pg-migrate status"
+    "migrations:create": "node-pg-migrate -m infra/migrations create",
+    "migrations:up": "node-pg-migrate -m infra/migrations --envPath .env.development up",
+    "migrations:down": "node-pg-migrate -m infra/migrations --envPath .env.development down",
+    "migrations:status": "node-pg-migrate status",
+    "wait-for-postgres": "node infra/scripts/wait-for-postgres.js"
   },
   "repository": {
     "type": "git",
