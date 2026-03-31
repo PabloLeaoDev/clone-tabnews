@@ -4,7 +4,7 @@
   "description": "Projeto de implementação do https://www.tabnews.com.br para o https://curso.dev",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run services:up && npm run wait-for-postgres && npm run migrations:up && next dev",
+    "dev": "npm run wait-for-docker && npm run services:up && npm run wait-for-postgres && npm run migrations:up && next dev",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:stop": "docker compose -f infra/compose.yaml stop",
     "services:down": "docker compose -f infra/compose.yaml down",
@@ -18,7 +18,8 @@
     "migrations:up": "node-pg-migrate -m infra/migrations --envPath .env.development up",
     "migrations:down": "node-pg-migrate -m infra/migrations --envPath .env.development down",
     "migrations:status": "node-pg-migrate status",
-    "wait-for-postgres": "node infra/scripts/wait-for-postgres.js"
+    "wait-for-postgres": "node infra/scripts/wait-for-postgres.js",
+    "wait-for-docker": "node infra/scripts/wait-for-docker.js"
   },
   "repository": {
     "type": "git",
