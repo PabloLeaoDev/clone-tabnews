@@ -3,7 +3,7 @@ const os = require("node:os");
 
 function execAsync(cmd) {
   return new Promise((resolve, reject) => {
-    exec(cmd, (error, stdout, stderr) => {
+    exec(cmd, (error, stdout) => {
       if (error) reject(error);
       else resolve(stdout);
     });
@@ -29,6 +29,7 @@ async function waitForDocker({ timeoutMs = 60000, intervalMs = 2000 } = {}) {
 
   process.stdout.write("⏳ Waiting Docker");
 
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       await execAsync("docker info");
