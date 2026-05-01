@@ -7,6 +7,7 @@ async function waitForAllServices() {
       if (!response.ok) throw Error(`HTTP Error ${response.status}`);
       await response.json();
     } catch (err) {
+      console.error(err);
       throw err;
     }
   };
