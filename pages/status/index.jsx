@@ -1,0 +1,76 @@
+import useSWR from "swr";
+import DOMPurify from "dompurify";
+
+async function fecthAPI(key) {
+  const response = await fetch(key),
+    responseBody = await response.json();
+
+  return responseBody;
+}
+
+function capitalizeFirstLetters(str) {
+  if (!str) return str;
+
+  let strArr = str.split(" ");
+  const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  for (let i in strArr) strArr[i] = capitalize(strArr[i]);
+
+  return strArr.join(" ");
+}
+
+function formatKeyText(text = "") {
+  let formatedText = text.replace(/_/g, " ");
+  return capitalizeFirstLetters(formatedText);
+}
+
+function DynamicStatus({ isLoading, data }) {
+  const wraperHTML = (value = "", tag = "span") => `<${tag}>${value}</${tag}>`,
+    strongestKey = (key = "") =>
+      wraperHTML(`${formatKeyText(key)}: `, "strong"),
+    liOrSpanDefiner = (key = "", value = "", isObj = false) =>
+      wraperHTML(strongestKey(key) + value, isObj ? "li" : "span");
+
+  const depsHTMLBuilder = (dep = {}, isObj = false) => {
+    const entries = Object.entries(dep);
+    let html = "",
+      htmlValue = "";
+
+    for (let [key, value] of entries) {
+      if (typeof value === "object" && !Array.isArray(value))
+        html += `
+          ${isObj ? "" : "<br>"}
+          ${strongestKey(key)} 
+          ${wraperHTML(depsHTMLBuilder(value, true), "ul")}
+        `;
+      else {
+        if (Array.isArray(value)) htmlValue = value.join(", ");
+        else htmlValue = value;
+        html += liOrSpanDefiner(key, htmlValue, isObj);
+      }
+    }
+
+    return html;
+  };
+
+  let deps = "<p>Loading...</p>";
+
+  if (!isLoading && data) {
+    deps = DOMPurify.sanitize(depsHTMLBuilder(data));
+  }
+
+  return <div dangerouslySetInnerHTML={{ __html: deps }} />;
+}
+
+export default function StatusPage() {
+  const { isLoading, data } = useSWR("/api/v1/status", fecthAPI, {
+    refreshInterval: 2000,
+  });
+
+  return (
+    <>
+      <h1>Status</h1>
+      <DynamicStatus isLoading={isLoading} data={data} />
+    </>
+  );
+}

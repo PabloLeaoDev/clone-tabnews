@@ -1,4 +1,4 @@
-import database from "/infra/database.js";
+import database from "infra/database.js";
 
 async function status(request, response) {
   const updatedAt = new Date().toISOString(),
@@ -10,8 +10,6 @@ async function status(request, response) {
             count(*)::int as opened_connections
           FROM pg_stat_activity
         `);
-
-  console.log(resStatus);
 
   return response.status(200).json({
     updated_at: updatedAt,
