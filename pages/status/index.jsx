@@ -31,7 +31,7 @@ function DynamicStatus({ isLoading, data }) {
     liOrSpanDefiner = (key = "", value = "", isObj = false) =>
       wraperHTML(strongestKey(key) + value, isObj ? "li" : "span");
 
-  const depsHTMLBuilder = (dep = {}, isObj = false) => {
+  const HTMLBuilder = (dep = {}, isObj = false) => {
     const entries = Object.entries(dep);
     let html = "",
       htmlValue = "";
@@ -41,7 +41,7 @@ function DynamicStatus({ isLoading, data }) {
         html += `
           ${isObj ? "" : "<br>"}
           ${strongestKey(key)} 
-          ${wraperHTML(depsHTMLBuilder(value, true), "ul")}
+          ${wraperHTML(HTMLBuilder(value, true), "ul")}
         `;
       else {
         if (Array.isArray(value)) htmlValue = value.join(", ");
@@ -56,7 +56,7 @@ function DynamicStatus({ isLoading, data }) {
   let deps = "<p>Loading...</p>";
 
   if (!isLoading && data) {
-    deps = DOMPurify.sanitize(depsHTMLBuilder(data));
+    deps = DOMPurify.sanitize(HTMLBuilder(data));
   }
 
   return <div dangerouslySetInnerHTML={{ __html: deps }} />;
