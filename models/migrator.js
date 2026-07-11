@@ -6,7 +6,7 @@ import { join } from "path";
 const defaultMigrationsOptions = {
   dir: join("infra", "migrations"),
   direction: "up",
-  verbose: true,
+  log: () => {},
   migrationsTable: "pgmigrations",
 };
 
