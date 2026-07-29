@@ -36,6 +36,7 @@ async function clearDatabase() {
 
 async function runPendingMigrations() {
   const migratedMigrations = await migrator.runPendingMigrations();
+  return migratedMigrations;
 }
 
 const orchestrator = {
