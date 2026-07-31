@@ -39,7 +39,7 @@ function getSSLValues() {
     };
   }
 
-  return process.env.NODE_ENV === "production";
+  return process.env.VERCEL_ENV === "production";
 }
 
 const database = {

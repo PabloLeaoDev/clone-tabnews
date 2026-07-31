@@ -1,10 +1,12 @@
 import retry from "async-retry";
 import database from "infra/database";
+import migrator from "models/migrator";
+import { requester } from "test/requester";
 
 async function waitForAllServices() {
   const fetchStatusPage = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/status");
+      const response = await requester("/api/v1/status");
       if (!response.ok) throw Error(`HTTP Error ${response.status}`);
       await response.json();
     } catch (err) {
@@ -32,9 +34,15 @@ async function clearDatabase() {
   await database.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
 }
 
+async function runPendingMigrations() {
+  const migratedMigrations = await migrator.runPendingMigrations();
+  return migratedMigrations;
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
+  runPendingMigrations,
 };
 
 export default orchestrator;

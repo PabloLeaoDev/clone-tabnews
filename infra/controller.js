@@ -6,6 +6,9 @@ function onNoMatchHandler(request, response) {
 }
 
 function onErrorHandler(error, request, response) {
+  if (!(error instanceof InternalServerError))
+    return response.status(error.statusCode).json(error);
+
   const publicErrorObject = new InternalServerError({
     statusCode: error.statusCode,
     cause: error,

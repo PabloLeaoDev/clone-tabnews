@@ -1,4 +1,5 @@
 import orchestrator from "test/orchestrator.js";
+import { requester } from "test/requester.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -8,9 +9,10 @@ beforeAll(async () => {
 describe("PUT api/v1/migrations", () => {
   describe("Anonymous user", () => {
     test("Running pending migrations", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await requester("/api/v1/migrations", {
         method: "PUT",
       });
+
       expect(response.status).toBe(405);
 
       const responseBody = await response.json();

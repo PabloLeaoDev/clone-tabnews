@@ -10,7 +10,7 @@ export default router.handler(controller);
 
 async function getHandler(request, response) {
   const updatedAt = new Date().toISOString(),
-    appEnv = process.env.NODE_ENV || "unknown",
+    appEnv = process.env.VERCEL_ENV || "unknown",
     resStatus = await database.query(`
             SELECT
               current_setting('server_version') as server_version,
