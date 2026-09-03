@@ -42,6 +42,46 @@ async function create(userInputValues) {
   return newUser;
 }
 
+async function update(username = "", userInputValues = {}) {
+  validateUserFields(Object.keys(userInputValues));
+
+  const currentUser = await user.findOneByUsername(username);
+
+  if ("username" in userInputValues) {
+    if (username.toLowerCase() === userInputValues.username.toLowerCase()) {
+      const validationErrorObject = new ValidationError({
+        message: "Username is already yours",
+        action: "Choose another username",
+      });
+      throw validationErrorObject;
+    }
+
+    await validateUsername(userInputValues.username);
+  }
+
+  if ("email" in userInputValues)
+    await validateUserEmail(userInputValues.email);
+
+  if ("password" in userInputValues)
+    await hashPasswordInObject(userInputValues);
+
+  const updatedUser = await runUpdateQuery(currentUser.id, userInputValues);
+
+  return updatedUser;
+}
+
+function validateUserFields(userFields = []) {
+  const allowedFields = ["username", "email", "password"];
+
+  if (userFields.some((f) => !allowedFields.includes(f))) {
+    const validationErrorObject = new ValidationError({
+      message: "Invalid user field(s)",
+      action: "Choose valids fields to update the user",
+    });
+    throw validationErrorObject;
+  }
+}
+
 async function validateUsername(username = "") {
   const result = await database.query({
     text: `
@@ -56,7 +96,6 @@ async function validateUsername(username = "") {
   });
 
   if (result.rowCount > 0) {
-    console.log(result.rows[0]);
     const validationErrorObject = new ValidationError({
       message: "Username already registered",
       action: "Choose another username",
@@ -108,12 +147,43 @@ async function runInsertQuery(userInputValues) {
       userInputValues.password,
     ],
   });
+
+  return result.rows[0];
+}
+
+async function runUpdateQuery(userId, userInputValues) {
+  let updateFields = "",
+    updateValues = [];
+
+  const userInputValuesMatrix = Object.entries(userInputValues);
+
+  for (let i = 0; i < userInputValuesMatrix.length; i++) {
+    updateFields += `${userInputValuesMatrix[i][0]} = $${i + 2}, `;
+    updateValues.push(userInputValuesMatrix[i][1]);
+  }
+
+  const result = await database.query({
+    text: `
+        UPDATE
+          users
+        SET
+          ${updateFields}
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      ;`,
+    values: [userId, ...updateValues],
+  });
+
   return result.rows[0];
 }
 
 const user = {
   create,
   findOneByUsername,
+  update,
 };
 
 export default user;
